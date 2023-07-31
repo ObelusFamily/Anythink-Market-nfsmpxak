@@ -22,7 +22,7 @@ function randChoice(choices) {
   return choices[index];
 }
 
-(async () => {
+const seed_users = async () => {
   User.deleteMany({}, () => {});
   console.log("seeding users");
   for (let i = 0; i < 100; i++) {
@@ -37,9 +37,9 @@ function randChoice(choices) {
     new_user.save();
   }
   console.log("Finished seeding users");
-})();
+}
 
-(async () => {
+const seed_items = async () => {
   console.log("seeding items");
   Item.deleteMany({}, () => {});
   const tags = ["cat", "dog", "bear"];
@@ -59,9 +59,9 @@ function randChoice(choices) {
     new_item.save();
   }
   console.log("Finished seeding items");
-})();
+}
 
-(async () => {
+const seed_comments = async () => {
   console.log("seeding comments");
   Comment.deleteMany({}, () => {});
 
@@ -82,6 +82,12 @@ function randChoice(choices) {
     new_comment.save();
   }
   console.log("Finished seeding comments");
-})();
+}
 
-process.exit();
+const seed = async () => {
+  seed_users()
+  seed_items()
+  seed_comments()
+}
+
+seed().then(() => process.exit())
