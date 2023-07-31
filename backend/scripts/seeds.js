@@ -22,7 +22,7 @@ function randChoice(choices) {
   return choices[index];
 }
 
-const seed_users = async () => {
+(async () => {
   User.deleteMany({}, () => {});
   console.log("seeding users");
   for (let i = 0; i < 100; i++) {
@@ -37,9 +37,9 @@ const seed_users = async () => {
     new_user.save();
   }
   console.log("Finished seeding users");
-}
+})();
 
-const seed_items = async () => {
+(async () => {
   console.log("seeding items");
   Item.deleteMany({}, () => {});
   const tags = ["cat", "dog", "bear"];
@@ -59,9 +59,9 @@ const seed_items = async () => {
     new_item.save();
   }
   console.log("Finished seeding items");
-}
+})();
 
-const seed_comments = async () => {
+(async () => {
   console.log("seeding comments");
   Comment.deleteMany({}, () => {});
 
@@ -82,12 +82,5 @@ const seed_comments = async () => {
     new_comment.save();
   }
   console.log("Finished seeding comments");
-}
-
-const seed = async () => {
-  seed_users()
-  seed_items()
-  seed_comments()
-}
-
-seed().then(() => process.exit())
+  await new Promise(r => setTimeout(r, 2000));
+})().then(() => mongoose.connection.close());
