@@ -11,7 +11,7 @@ if (!process.env.MONGODB_URI) {
   console.warn("Missing MONGODB_URI in env, please add it to your .env file");
 }
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 
 let Item = mongoose.model("Item");
 let Comment = mongoose.model("Comment");
@@ -22,9 +22,9 @@ function randChoice(choices) {
   return choices[index];
 }
 
-// iife to creat users
-(() => {
+(async () => {
   User.deleteMany({}, () => {});
+  console.log("seeding users");
   for (let i = 0; i < 100; i++) {
     let new_user = new User();
     new_user.username = faker.string.alphanumeric({
@@ -36,13 +36,14 @@ function randChoice(choices) {
     );
     new_user.save();
   }
+  console.log("Finished seeding users");
 })();
 
-// iife to creat items/products
 (async () => {
+  console.log("seeding items");
   Item.deleteMany({}, () => {});
   const tags = ["cat", "dog", "bear"];
-  const users = await User.countDocuments({}, (count) => count);
+  const users = await User.countDocuments({});
   for (let i = 0; i < 100; i++) {
     let new_item = new Item({
       title: faker.string.alpha({ length: { min: 5, max: 10 } }),
@@ -57,25 +58,30 @@ function randChoice(choices) {
     );
     new_item.save();
   }
+  console.log("Finished seeding items");
 })();
 
-// iife to creat comments
 (async () => {
-  const users = await User.countDocuments({}, (count) => count);
-  const items = await Item.countDocuments({}, (count) => count);
+  console.log("seeding comments");
+  Comment.deleteMany({}, () => {});
+
+  const users = await User.countDocuments({});
+  const items = await Item.countDocuments({});
+
   for (let i = 0; i < 100; i++) {
     let new_comment = new Comment({
       body: faker.lorem.sentence({ min: 3, max: 5 }),
     });
 
     new_comment.seller = await User.findOne().skip(
-      Math.ceil(Math.random() * users),
-      (user) => user
+      Math.ceil(Math.random() * users)
     );
     new_comment.item = await Item.findOne().skip(
-      Math.ceil(Math.random() * items),
-      (item) => item
+      Math.ceil(Math.random() * items)
     );
     new_comment.save();
   }
+  console.log("Finished seeding comments");
 })();
+
+process.exit();
